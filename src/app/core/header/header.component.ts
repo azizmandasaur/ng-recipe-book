@@ -30,7 +30,7 @@ export class HeaderComponent {
     this.authService.logOut();
   }
 
-  isAuthentcated() {
+  isAuthenticated() {
     return this.authService.isAuthenticated();
   }
 }
