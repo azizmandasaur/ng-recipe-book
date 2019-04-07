@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators';
 
 import { RecipeService } from '../recipes/recipe.service';
 import { AuthService } from '../auth/auth.service';
+import { Recipe } from '../recipes/recipe.model';
 
 @Injectable({
     providedIn: 'root'
@@ -18,27 +19,27 @@ export class DataStorageService {
     storeRecipes() {
         const token = this.authService.getToken();
 
-        return this.http.put('https://ng-recipe-book-7c060.firebaseio.com/recipes.json?auth=' + token, this.recipeService.getRecipes());
+        return this.http.put('https://ng-recipe-book-7c060.firebaseio.com/recipes.json', this.recipeService.getRecipes());
     }
 
     fetchRecipes() {
         const token = this.authService.getToken();
 
-        this.http.get('https://ng-recipe-book-7c060.firebaseio.com/recipes.json?auth=' + token)
-            // .pipe(
-            //     map(
-            //         const recipes = response;
-            //         for (let recipe of recipes) {
-            //             if (!recipe['ingredients']) {
-            //             recipe['ingredients'] = [];
-            //             }
-            //         }
-            //         return recipes;
-            //     )
-            // );
+        this.http.get<Recipe[]>('https://ng-recipe-book-7c060.firebaseio.com/recipes.json')
+            .pipe(
+                map(
+                    (recipes) => {
+                        for (let recipe of recipes) {
+                            if (!recipe['ingredients']) {
+                                recipe['ingredients'] = [];
+                            }
+                        }
+                        return recipes;
+                    }
+                )
+            )
             .subscribe(
-                (response) => {
-                    const recipes = response;
+                (recipes: Recipe[]) => {
                     this.recipeService.setRecipes(recipes);
                 }
             );
